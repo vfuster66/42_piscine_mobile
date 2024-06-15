@@ -292,7 +292,7 @@ class AgendaPageState extends State<AgendaPage> {
                       titleTextStyle: const TextStyle().copyWith(color: darkPurple, fontSize: 16),
                       leftChevronIcon: const Icon(Icons.chevron_left, color: darkPurple),
                       rightChevronIcon: const Icon(Icons.chevron_right, color: darkPurple),
-                      formatButtonVisible: false, // Hide the format button
+                      formatButtonVisible: false,
                     ),
                   ),
                 ),

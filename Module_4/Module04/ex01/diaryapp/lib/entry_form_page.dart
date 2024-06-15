@@ -1,26 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';  // Ajoutez ce package pour la gestion des dates
+import 'package:intl/intl.dart';
 
 class EntryFormPage extends StatefulWidget {
   final DocumentSnapshot? entry;
 
-  const EntryFormPage({Key? key, this.entry}) : super(key: key);
+  const EntryFormPage({super.key, this.entry});
 
   @override
-  _EntryFormPageState createState() => _EntryFormPageState();
+  EntryFormPageState createState() => EntryFormPageState();
 }
 
-class _EntryFormPageState extends State<EntryFormPage> {
+class EntryFormPageState extends State<EntryFormPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _titleController;
-  late TextEditingController _feelingController;
   late TextEditingController _contentController;
   DateTime? _selectedDate;
+  String? _selectedFeeling;
+
+  final List<Map<String, String>> _feelings = [
+    {'label': 'Happy', 'emoji': '😊'},
+    {'label': 'Sad', 'emoji': '😢'},
+    {'label': 'Angry', 'emoji': '😠'},
+    {'label': 'Excited', 'emoji': '😃'},
+    {'label': 'Tired', 'emoji': '😴'},
+    {'label': 'Confused', 'emoji': '😕'},
+    {'label': 'Surprised', 'emoji': '😮'},
+    {'label': 'Calm', 'emoji': '😌'},
+    {'label': 'Fearful', 'emoji': '😨'},
+    {'label': 'Disgusted', 'emoji': '🤢'},
+    {'label': 'Pensive', 'emoji': '🤔'},
+    {'label': 'Joyful', 'emoji': '😁'},
+    {'label': 'Relaxed', 'emoji': '😎'},
+    {'label': 'Annoyed', 'emoji': '😒'},
+  ];
 
   @override
   void initState() {
@@ -28,22 +45,21 @@ class _EntryFormPageState extends State<EntryFormPage> {
 
     _titleController = TextEditingController(
         text: widget.entry != null ? widget.entry!['title'] : '');
-    _feelingController = TextEditingController(
-        text: widget.entry != null ? widget.entry!['feeling'] : '');
     _contentController = TextEditingController(
         text: widget.entry != null ? widget.entry!['content'] : '');
     _selectedDate = widget.entry != null
         ? (widget.entry!['date'] as Timestamp).toDate()
         : DateTime.now();
+    _selectedFeeling = widget.entry != null ? widget.entry!['feeling'] : null;
   }
 
   Future<void> _saveEntry() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _selectedFeeling != null) {
       final User? user = _auth.currentUser;
 
       if (user != null) {
+        final contextToUse = context;
         if (widget.entry != null) {
-          // Update existing entry
           await _firestore
               .collection('entries')
               .doc(user.uid)
@@ -51,27 +67,31 @@ class _EntryFormPageState extends State<EntryFormPage> {
               .doc(widget.entry!.id)
               .update({
             'title': _titleController.text,
-            'feeling': _feelingController.text,
+            'feeling': _selectedFeeling,
             'content': _contentController.text,
             'date': _selectedDate,
           });
         } else {
-          // Create new entry
           await _firestore
               .collection('entries')
               .doc(user.uid)
               .collection('userEntries')
               .add({
             'title': _titleController.text,
-            'feeling': _feelingController.text,
+            'feeling': _selectedFeeling,
             'content': _contentController.text,
             'date': _selectedDate,
             'email': user.email,
           });
         }
-
-        Navigator.pop(context);
+        if (contextToUse.mounted) {
+          Navigator.pop(contextToUse);
+        }
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a feeling')),
+      );
     }
   }
 
@@ -89,68 +109,177 @@ class _EntryFormPageState extends State<EntryFormPage> {
     }
   }
 
+  void _cancelEntry() {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    const Color darkPurple = Color(0xFF6A0DAD);
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.entry != null ? 'Edit Entry' : 'New Entry')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
+      body: Stack(
+        children: [
+          // Image de fond
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/background.jpg'),
+                fit: BoxFit.cover,
               ),
-              TextFormField(
-                controller: _feelingController,
-                decoration: const InputDecoration(labelText: 'Feeling'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a feeling';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _contentController,
-                decoration: const InputDecoration(labelText: 'Content'),
-                maxLines: 5,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some content';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Text(
-                    _selectedDate != null
-                        ? 'Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'
-                        : 'No date selected',
-                  ),
-                  TextButton(
-                    onPressed: () => _selectDate(context),
-                    child: const Text('Select date'),
-                  ),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: _saveEntry,
-                child: Text(widget.entry != null ? 'Update Entry' : 'Add Entry'),
-              ),
-            ],
+            ),
           ),
-        ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20), // Add space at the top
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        labelText: 'Title',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a title';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _contentController,
+                      decoration: InputDecoration(
+                        labelText: 'Content',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      maxLines: 5,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter some content';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Text(
+                          _selectedDate != null
+                              ? 'Date: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}'
+                              : 'No date selected',
+                          style: const TextStyle(fontSize: 16, color: darkPurple),
+                        ),
+                        const SizedBox(width: 20),
+                        TextButton(
+                          onPressed: () => _selectDate(context),
+                          style: TextButton.styleFrom(
+                            foregroundColor: darkPurple,
+                            side: const BorderSide(color: darkPurple),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Select date'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Feeling:', style: TextStyle(fontSize: 16, color: darkPurple)),
+                    Wrap(
+                      spacing: 4.0, // Reduced spacing
+                      runSpacing: 4.0, // Reduced run spacing
+                      children: _feelings.map((feeling) {
+                        return SizedBox(
+                          width: 40, // Fixed width for each emoji container, reduced size
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedFeeling = feeling['label'];
+                              });
+                            },
+                            child: Tooltip(
+                              message: feeling['label']!,
+                              child: Container(
+                                margin: const EdgeInsets.all(2.0), // Reduced margin
+                                padding: const EdgeInsets.all(2.0), // Reduced padding
+                                decoration: BoxDecoration(
+                                  color: _selectedFeeling == feeling['label']
+                                      ? darkPurple.withOpacity(0.3)
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                    color: _selectedFeeling == feeling['label']
+                                        ? darkPurple
+                                        : Colors.transparent,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    feeling['emoji']!,
+                                    style: const TextStyle(fontSize: 24), // Reduced font size for emojis
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: _cancelEntry,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: const BorderSide(color: Colors.red),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            ),
+                            child: const Text('Cancel Entry'),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: _saveEntry,
+                            style: TextButton.styleFrom(
+                              foregroundColor: darkPurple,
+                              side: const BorderSide(color: darkPurple),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            ),
+                            child: Text(widget.entry != null ? 'Update Entry' : 'Add Entry'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
