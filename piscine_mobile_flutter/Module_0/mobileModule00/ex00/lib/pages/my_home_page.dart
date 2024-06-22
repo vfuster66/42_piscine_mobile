@@ -1,4 +1,9 @@
+
 // pages/my_home_page.dart
+// This file defines the home page of the application as a StatefulWidget.
+// The home page consists of a centered text and a button.
+// When the button is pressed, a message "Button pressed" is logged in the console.
+
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -22,7 +27,7 @@ class MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    print('Button pressed');
+                    debugPrint('Button pressed');
                   },
                   child: const Text('Press me'),
                 ),
