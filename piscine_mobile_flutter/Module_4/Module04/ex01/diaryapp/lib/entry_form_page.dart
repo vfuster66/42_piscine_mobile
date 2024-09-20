@@ -1,3 +1,6 @@
+
+// entry_form_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,6 +40,7 @@ class EntryFormPageState extends State<EntryFormPage> {
     {'label': 'Joyful', 'emoji': '😁'},
     {'label': 'Relaxed', 'emoji': '😎'},
     {'label': 'Annoyed', 'emoji': '😒'},
+
   ];
 
   @override
@@ -71,6 +75,9 @@ class EntryFormPageState extends State<EntryFormPage> {
             'content': _contentController.text,
             'date': _selectedDate,
           });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Entrée mise à jour avec succès')),
+          );
         } else {
           await _firestore
               .collection('entries')
@@ -83,6 +90,9 @@ class EntryFormPageState extends State<EntryFormPage> {
             'date': _selectedDate,
             'email': user.email,
           });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Nouvelle entrée ajoutée avec succès')),
+          );
         }
         if (contextToUse.mounted) {
           Navigator.pop(contextToUse);
@@ -90,7 +100,7 @@ class EntryFormPageState extends State<EntryFormPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a feeling')),
+        const SnackBar(content: Text('Veuillez remplir tous les champs et sélectionner un sentiment')),
       );
     }
   }
@@ -150,7 +160,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter a title';
+                          return 'Veuillez entrer un titre';
                         }
                         return null;
                       },
@@ -169,7 +179,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                       maxLines: 5,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter some content';
+                          return 'Veuillez entrer du contenu';
                         }
                         return null;
                       },
@@ -180,7 +190,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                         Text(
                           _selectedDate != null
                               ? 'Date: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}'
-                              : 'No date selected',
+                              : 'Pas de date sélectionnée',
                           style: const TextStyle(fontSize: 16, color: darkPurple),
                         ),
                         const SizedBox(width: 20),
@@ -193,18 +203,18 @@ class EntryFormPageState extends State<EntryFormPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text('Select date'),
+                          child: const Text('Sélectionner la date'),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text('Feeling:', style: TextStyle(fontSize: 16, color: darkPurple)),
+                    const Text('Sentiment :', style: TextStyle(fontSize: 16, color: darkPurple)),
                     Wrap(
-                      spacing: 4.0, // Reduced spacing
-                      runSpacing: 4.0, // Reduced run spacing
+                      spacing: 4.0,
+                      runSpacing: 4.0,
                       children: _feelings.map((feeling) {
                         return SizedBox(
-                          width: 40, // Fixed width for each emoji container, reduced size
+                          width: 40,
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -214,8 +224,8 @@ class EntryFormPageState extends State<EntryFormPage> {
                             child: Tooltip(
                               message: feeling['label']!,
                               child: Container(
-                                margin: const EdgeInsets.all(2.0), // Reduced margin
-                                padding: const EdgeInsets.all(2.0), // Reduced padding
+                                margin: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(2.0),
                                 decoration: BoxDecoration(
                                   color: _selectedFeeling == feeling['label']
                                       ? darkPurple.withOpacity(0.3)
@@ -230,7 +240,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                                 child: Center(
                                   child: Text(
                                     feeling['emoji']!,
-                                    style: const TextStyle(fontSize: 24), // Reduced font size for emojis
+                                    style: const TextStyle(fontSize: 24),
                                   ),
                                 ),
                               ),
@@ -254,7 +264,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
-                            child: const Text('Cancel Entry'),
+                            child: const Text('Annuler'),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -269,7 +279,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
-                            child: Text(widget.entry != null ? 'Update Entry' : 'Add Entry'),
+                            child: Text(widget.entry != null ? 'Mettre à jour' : 'Ajouter'),
                           ),
                         ),
                       ],
@@ -284,3 +294,6 @@ class EntryFormPageState extends State<EntryFormPage> {
     );
   }
 }
+
+
+

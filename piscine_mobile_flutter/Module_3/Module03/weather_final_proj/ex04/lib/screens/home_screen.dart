@@ -1,5 +1,8 @@
+
+// screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import '../services/location_service.dart';
 import '../services/weather_service.dart';
 import '../widgets/bottom_bar.dart';
@@ -20,13 +23,15 @@ class HomeScreenState extends State<HomeScreen> {
   String _selectedCityName = '';
   String _selectedRegion = '';
   String _selectedCountry = '';
-  String _errorMessage = '';
   Map<String, dynamic>? _weatherData;
   List<Map<String, dynamic>> _citySuggestions = [];
+  String _errorMessage = '';
+  String _locationMessage = '';
 
   final TextEditingController _searchController = TextEditingController();
   final LocationService _locationService = LocationService();
   final WeatherService _weatherService = WeatherService();
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -38,6 +43,7 @@ class HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -45,69 +51,77 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    _pageController.jumpToPage(index);
   }
 
-  void _onSearchChanged() async {
-    if (_searchController.text.isEmpty) {
-      setState(() {
-        _errorMessage = '';
-        _citySuggestions = [];
-      });
+  void _onSearchChanged() {
+    if (_searchController.text.isNotEmpty) {
+      _onSearch(_searchController.text);
     } else {
-      try {
-        List<Map<String, dynamic>> suggestions = await _weatherService.getCitySuggestions(_searchController.text);
-        setState(() {
-          _citySuggestions = suggestions;
-          _errorMessage = ''; // Clear the error message on successful search
-        });
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'Failed to connect to the API, check your connection';
-          _citySuggestions = [];
-        });
-      }
+      setState(() {
+        _citySuggestions = [];
+        _errorMessage = '';
+      });
+    }
+  }
+
+  void _onSearchSubmitted() {
+    if (_citySuggestions.isNotEmpty) {
+      final firstSuggestion = _citySuggestions.first;
+      _selectCity(
+        '${firstSuggestion['name']}, ${firstSuggestion['country']}',
+        firstSuggestion['latitude'],
+        firstSuggestion['longitude'],
+      );
     }
   }
 
   void _onSearch(String searchText) async {
-    if (searchText.isEmpty) {
-      setState(() {
-        _errorMessage = 'Please enter a city name';
-      });
-      return;
-    }
-
     try {
-      List<Map<String, dynamic>> suggestions = await _weatherService.getCitySuggestions(searchText);
+      List<Map<String, dynamic>> suggestions = await _weatherService
+          .getCitySuggestions(searchText);
       if (suggestions.isEmpty) {
         setState(() {
-          _errorMessage = 'Invalid city name, try again';
-          _citySuggestions = [];
+          _errorMessage =
+          "Aucune ville trouvée."; // Display error if no cities are found
         });
       } else {
         setState(() {
           _citySuggestions = suggestions;
-          _errorMessage = ''; // Clear the error message on successful search
+          _errorMessage = ''; // Clear error message if there are suggestions
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to connect to the API, check your connection';
-        _citySuggestions = [];
+        _locationMessage = e.toString();
       });
     }
   }
 
-  void _selectCity(String cityName, String? region, String country, double latitude, double longitude) {
+  void _selectCity(String cityName, double latitude, double longitude, {String? region, String? country}) {
     setState(() {
       _citySuggestions = [];
       _selectedCityName = cityName;
-      _selectedRegion = region ?? '';
-      _selectedCountry = country;
       _searchController.clear();
-      _errorMessage = '';
-      _weatherData = null;
+      _locationMessage = ''; // Clear the location message
+      _weatherData = null; // Clear the previous weather data
+      _errorMessage = ''; // Clear error message when a city is selected
+
+      // Met à jour la région et le pays seulement s'ils sont valides
+      if (region != null && region.isNotEmpty) {
+        _selectedRegion = region;
+      } else {
+        _selectedRegion = ''; // Pas de région si elle n'est pas trouvée
+      }
+
+      if (country != null && country.isNotEmpty) {
+        _selectedCountry = country;
+      } else {
+        _selectedCountry = ''; // Pas de pays si non trouvé
+      }
     });
+
+    // Obtenir la météo avec les nouvelles coordonnées
     _getWeather(latitude, longitude);
   }
 
@@ -120,8 +134,9 @@ class HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose location accuracy'),
-          content: const Text('Please choose the desired location accuracy.'),
+          title: const Text('Choisissez la précision de la localisation'),
+          content: const Text(
+              'Veuillez choisir la précision souhaitée pour la localisation.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -145,63 +160,90 @@ class HomeScreenState extends State<HomeScreen> {
 
   void _determinePosition(LocationAccuracy accuracy) async {
     try {
+      // Obtenir la position actuelle
       Position position = await _locationService.determinePosition(accuracy: accuracy);
-      setState(() {
-        _selectedCityName = '';
-        _selectedRegion = '';
-        _selectedCountry = '';
-        _searchController.clear();
-        _weatherData = null;
-        _errorMessage = '';
-      });
 
-      _getWeather(position.latitude, position.longitude);
+      // Récupérer le nom de la ville, la région et le pays via le reverse geocoding
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks.first;
+        String cityName = placemark.locality ?? 'Ville inconnue';
+        String country = placemark.country ?? 'Pays inconnu';
+        String region = placemark.administrativeArea ?? 'Région inconnue';
+
+        setState(() {
+          _locationMessage = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
+          _selectedCityName = cityName;
+          _weatherData = null;
+          _selectedRegion = region;
+          _selectedCountry = country;
+          _searchController.clear();
+        });
+
+        // Appeler la fonction pour obtenir les informations météo en fonction de la position
+        _getWeather(position.latitude, position.longitude);
+      }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to determine position, please try again';
+        _locationMessage = e.toString();
       });
     }
   }
 
   void _getWeather(double latitude, double longitude) async {
     try {
-      Map<String, dynamic> weatherData = await _weatherService.getWeather(latitude, longitude);
+      Map<String, dynamic> weatherData = await _weatherService.getWeather(
+          latitude, longitude);
+
       setState(() {
         _weatherData = weatherData;
-        _errorMessage = '';
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to retrieve weather data, check your connection';
+        _locationMessage = e.toString();
       });
     }
   }
 
   Widget _buildCurrentScreen() {
-    return CurrentlyScreen(
-      weatherData: _weatherData!,
-      cityName: _selectedCityName,
-      region: _selectedRegion,
-      country: _selectedCountry,
-    );
+    if (_weatherData != null) {
+      return CurrentlyScreen(
+        weatherData: _weatherData!,
+        cityName: _selectedCityName,
+        region: _selectedRegion,
+        country: _selectedCountry,
+      );
+    } else {
+      return const Center(child: Text("Chargement des données météo..."));
+    }
   }
 
   Widget _buildTodayScreen() {
-    return TodayScreen(
-      weatherData: _weatherData!,
-      cityName: _selectedCityName,
-      region: _selectedRegion,
-      country: _selectedCountry,
-    );
+    if (_weatherData != null) {
+      return TodayScreen(
+        weatherData: _weatherData!,
+        cityName: _selectedCityName,
+        region: _selectedRegion,
+        country: _selectedCountry,
+      );
+    } else {
+      return const Center(child: Text("Chargement des données météo..."));
+    }
   }
 
   Widget _buildWeeklyScreen() {
-    return WeeklyScreen(
-      weatherData: _weatherData!,
-      cityName: _selectedCityName,
-      region: _selectedRegion,
-      country: _selectedCountry,
-    );
+    if (_weatherData != null) {
+      return WeeklyScreen(
+        weatherData: _weatherData!,
+        cityName: _selectedCityName,
+        region: _selectedRegion,
+        country: _selectedCountry,
+      );
+    } else {
+      return const Center(child: Text("Chargement des données météo..."));
+    }
   }
 
   @override
@@ -210,37 +252,71 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: TopBar(
         searchController: _searchController,
         onSearch: _onSearch,
+        onSearchSubmitted: _onSearchSubmitted,
         onGeolocate: _onGeolocate,
         citySuggestions: _citySuggestions,
-        onSelectCity: _selectCity,
-        height: 80, // Set the height of the TopBar to 80
+        onSelectCity: (String cityName, String? region, String country,
+            double latitude, double longitude) {
+          _selectCity(cityName, latitude, longitude);
+        },
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30), // Ajoute un borderRadius à la BoxDecoration
+          image: const DecorationImage(
             image: AssetImage('assets/blue-sky-background.jpg'),
             fit: BoxFit.cover,
           ),
         ),
+        clipBehavior: Clip.antiAlias,
         child: SafeArea(
           child: Column(
             children: [
-              if (_errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    _errorMessage,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
+              // Si des suggestions de ville existent, elles s'affichent ici sous la barre de recherche
+              if (_citySuggestions.isNotEmpty)
+                SizedBox(
+                  height: 200,
+                  // Ajuster la hauteur du conteneur pour les suggestions
+                  child: ListView.builder(
+                    itemCount: _citySuggestions.length,
+                    itemBuilder: (context, index) {
+                      final suggestion = _citySuggestions[index];
+                      final region = suggestion['region'];
+                      final cityDisplayName = region != null &&
+                          region.isNotEmpty
+                          ? '${suggestion['name']}, $region, ${suggestion['country']}'
+                          : '${suggestion['name']}, ${suggestion['country']}';
+                      return ListTile(
+                        title: Text(cityDisplayName),
+                        onTap: () {
+                          _selectCity(
+                            '${suggestion['name']}, ${suggestion['country']}',
+                            suggestion['latitude'],
+                            suggestion['longitude'],
+                            region: suggestion['region'],  // Passer la région ici si elle existe
+                            country: suggestion['country'],  // Passer le pays ici
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
+              // La partie principale de la page prend l'espace restant (le PageView)
               Expanded(
-                child: _weatherData == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : _selectedIndex == 0
-                    ? _buildCurrentScreen()
-                    : _selectedIndex == 1
-                    ? _buildTodayScreen()
-                    : _buildWeeklyScreen(),
+                child: PageView(
+                  controller: _pageController, // Utiliser un PageController
+                  onPageChanged: (index) {
+                    setState(() {
+                      _selectedIndex =
+                          index; // Mettre à jour l'index sélectionné
+                    });
+                  },
+                  children: [
+                    _buildCurrentScreen(), // Écran "Current"
+                    _buildTodayScreen(), // Écran "Today"
+                    _buildWeeklyScreen(), // Écran "Weekly"
+                  ],
+                ),
               ),
             ],
           ),
@@ -248,8 +324,16 @@ class HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomBar(
         selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+        onItemTapped: (index) {
+          setState(() {
+            _selectedIndex =
+                index; // Mise à jour de l'index lorsque l'utilisateur appuie sur un élément de la barre
+          });
+          _pageController.jumpToPage(
+              index); // Naviguer vers la page correspondante
+        },
       ),
     );
   }
 }
+

@@ -1,7 +1,11 @@
+
+// profile_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'entry_form_page.dart';
+import 'first_page.dart'; // Importer FirstPage pour rediriger après déconnexion
 
 class ReverseScrollPhysics extends ScrollPhysics {
   const ReverseScrollPhysics({super.parent});
@@ -49,11 +53,44 @@ class ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const FirstPage()),
+          (Route<dynamic> route) => false,
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+    const Color darkPurple = Color(0xAA6A0DAD);
+
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile Page'),
+        backgroundColor: darkPurple,
+        automaticallyImplyLeading: false,
+        actions: [
+          TextButton.icon(
+            onPressed: _logout,
+            icon: const Icon(Icons.logout, color: Colors.white),
+            label: const Text(
+              'Logout',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18, // Taille de police augmentée pour plus de visibilité
+                fontWeight: FontWeight.bold, // Ajout de gras pour plus de visibilité
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
+          // Image de fond
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -64,32 +101,6 @@ class ProfilePageState extends State<ProfilePage> {
           ),
           Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.deepPurple),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    const Spacer(),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        'Profile',
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-              ),
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
                   stream: _entries.orderBy('date').snapshots(),
@@ -150,7 +161,21 @@ class ProfilePageState extends State<ProfilePage> {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
                   onPressed: () => _navigateToEntryForm(),
-                  child: const Text('Add New Entry'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: darkPurple,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+                    shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+
+                  child: const Text(
+                    'Add New Entry',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18, // Taille de police augmentée
+                    ),
+                  ),
                 ),
               ),
             ],

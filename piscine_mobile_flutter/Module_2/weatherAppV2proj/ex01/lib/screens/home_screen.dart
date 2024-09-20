@@ -1,6 +1,9 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:weather_icons/weather_icons.dart'; // Import the weather icons package
+import 'package:geocoding/geocoding.dart';
+import 'package:weather_icons/weather_icons.dart';
 import '../services/location_service.dart';
 import '../services/weather_service.dart';
 import '../widgets/bottom_bar.dart';
@@ -22,10 +25,12 @@ class HomeScreenState extends State<HomeScreen> {
   String _selectedCityName = '';
   Map<String, dynamic>? _weatherData;
   List<Map<String, dynamic>> _citySuggestions = [];
+  String _errorMessage = ''; // New variable for error message
 
   final TextEditingController _searchController = TextEditingController();
   final LocationService _locationService = LocationService(); // Instance of the location service
   final WeatherService _weatherService = WeatherService(); // Instance of the weather service
+  final PageController _pageController = PageController(); // PageController for swiping
 
   static const List<Widget> _widgetOptions = <Widget>[
     CurrentlyScreen(key: PageStorageKey('CurrentlyScreen')),
@@ -43,6 +48,7 @@ class HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _pageController.dispose(); // Dispose PageController
     super.dispose();
   }
 
@@ -50,6 +56,7 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    _pageController.jumpToPage(index); // Navigate to the selected page
   }
 
   void _onSearchChanged() {
@@ -58,6 +65,7 @@ class HomeScreenState extends State<HomeScreen> {
     } else {
       setState(() {
         _citySuggestions = [];
+        _errorMessage = ''; // Clear the error message when the search text is empty
       });
     }
   }
@@ -65,9 +73,16 @@ class HomeScreenState extends State<HomeScreen> {
   void _onSearch(String searchText) async {
     try {
       List<Map<String, dynamic>> suggestions = await _weatherService.getCitySuggestions(searchText);
-      setState(() {
-        _citySuggestions = suggestions;
-      });
+      if (suggestions.isEmpty) {
+        setState(() {
+          _errorMessage = "Aucune ville trouvée."; // Display error if no cities are found
+        });
+      } else {
+        setState(() {
+          _citySuggestions = suggestions;
+          _errorMessage = ''; // Clear error message if there are suggestions
+        });
+      }
     } catch (e) {
       setState(() {
         _locationMessage = e.toString();
@@ -82,8 +97,20 @@ class HomeScreenState extends State<HomeScreen> {
       _searchController.clear();
       _locationMessage = ''; // Clear the location message
       _weatherData = null; // Clear the previous weather data
+      _errorMessage = ''; // Clear error message when a city is selected
     });
     _getWeather(latitude, longitude);
+  }
+
+  void _onSearchSubmitted() {
+    if (_citySuggestions.isNotEmpty) {
+      final firstSuggestion = _citySuggestions.first;
+      _selectCity(
+        '${firstSuggestion['name']}, ${firstSuggestion['country']}',
+        firstSuggestion['latitude'],
+        firstSuggestion['longitude'],
+      );
+    }
   }
 
   void _onGeolocate() async {
@@ -120,36 +147,46 @@ class HomeScreenState extends State<HomeScreen> {
 
   void _determinePosition(LocationAccuracy accuracy) async {
     try {
+      // Obtenir la position actuelle
       Position position = await _locationService.determinePosition(accuracy: accuracy);
+
+      // Récupérer le nom de la ville via le reverse geocoding
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      // Vérification que la liste des placemarks n'est pas vide et que le champ locality n'est pas null
+      String cityName = (placemarks.isNotEmpty && placemarks.first.locality != null)
+          ? placemarks.first.locality!
+          : 'Ville inconnue'; // Fallback si le reverse geocoding ne trouve pas la ville
+
+
       setState(() {
         _locationMessage = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
-        _selectedCityName = ''; // Clear the city name
-        _searchController.clear(); // Clear the search controller
-        _weatherData = null; // Clear the previous weather data
+        _selectedCityName = cityName;
+        _searchController.clear();
+        _weatherData = null;
       });
-      print(_locationMessage); // Log the location
 
+      // Appel de la fonction pour obtenir les informations météo en fonction de la position
       _getWeather(position.latitude, position.longitude);
     } catch (e) {
       setState(() {
         _locationMessage = e.toString();
       });
-      print(_locationMessage); // Log the error
     }
   }
 
   void _getWeather(double latitude, double longitude) async {
     try {
       Map<String, dynamic> weatherData = await _weatherService.getWeather(latitude, longitude);
+
       setState(() {
         _weatherData = weatherData;
       });
-      print(weatherData); // Log the weather data
+
     } catch (e) {
       setState(() {
         _locationMessage = e.toString();
       });
-      print(_locationMessage); // Log the error
     }
   }
 
@@ -192,40 +229,90 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: TopBar(
         searchController: _searchController,
         onSearch: _onSearch,
+        onSearchSubmitted: _onSearchSubmitted,
         onGeolocate: _onGeolocate,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _widgetOptions.elementAt(_selectedIndex),
-            if (_selectedCityName.isNotEmpty) Text(_selectedCityName), // Display the full name of the selected city
-            if (_locationMessage.isNotEmpty) Text(_locationMessage),
-            if (_citySuggestions.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _citySuggestions.length,
-                  itemBuilder: (context, index) {
-                    final suggestion = _citySuggestions[index];
-                    return ListTile(
-                      title: Text('${suggestion['name']}, ${suggestion['country']}'),
-                      onTap: () {
-                        _selectCity('${suggestion['name']}, ${suggestion['country']}', suggestion['latitude'], suggestion['longitude']);
-                      },
-                    );
+      body: Column(
+        children: [
+          // Affichage des suggestions de ville sous la barre de recherche
+          if (_citySuggestions.isNotEmpty)
+            SizedBox(
+              height: 150, // Taille définie pour la liste des suggestions
+              child: ListView.builder(
+                itemCount: _citySuggestions.length,
+                itemBuilder: (context, index) {
+                  final suggestion = _citySuggestions[index];
+                  return ListTile(
+                    title: Text('${suggestion['name']}, ${suggestion['country']}'),
+                    onTap: () {
+                      _selectCity('${suggestion['name']}, ${suggestion['country']}', suggestion['latitude'], suggestion['longitude']);
+                    },
+                  );
+                },
+              ),
+            ),
+
+          // Affichage du reste du contenu
+          Expanded(
+            child: Stack(
+              children: [
+                PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
                   },
+                  children: _widgetOptions,
                 ),
-              ),
-            if (_weatherData != null)
-              Column(
-                children: [
-                  Text('Température actuelle : ${_weatherData!['current_weather']['temperature']} °C'),
-                  Icon(getWeatherIcon(_weatherData!['current_weather']['weathercode'])), // Display weather icon
-                  Text('Vitesse du vent : ${_weatherData!['current_weather']['windspeed']} km/h'),
-                ],
-              ),
-          ],
-        ),
+
+                if (_weatherData != null)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min, // Centre verticalement le contenu
+                        children: [
+                          // Affichage du nom de la ville sélectionnée
+                          if (_selectedCityName.isNotEmpty)
+                            Text(
+                              _selectedCityName,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          const SizedBox(height: 8),
+
+                          // Affichage des coordonnées GPS
+                          if (_locationMessage.isNotEmpty)
+                            Text(
+                              _locationMessage, // Affiche la latitude et la longitude
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          const SizedBox(height: 8),
+
+                          // Affichage des informations météo
+                          Text(
+                            'Température actuelle : ${_weatherData!['current_weather']['temperature']} °C',
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          Icon(
+                            getWeatherIcon(_weatherData!['current_weather']['weathercode']),
+                            size: 64,
+                          ),
+                          Text(
+                            'Vitesse du vent : ${_weatherData!['current_weather']['windspeed']} km/h',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomBar(
         selectedIndex: _selectedIndex,
@@ -233,4 +320,5 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 }

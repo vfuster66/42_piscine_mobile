@@ -1,6 +1,3 @@
-
-// screens/home_screen.dart
-// screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/location_service.dart';
@@ -22,8 +19,9 @@ class HomeScreenState extends State<HomeScreen> {
   String _searchText = '';
   String _locationMessage = '';
 
+  final PageController _pageController = PageController(); // Ajout d'un PageController
   final TextEditingController _searchController = TextEditingController();
-  final LocationService _locationService = LocationService(); // Instance du service de localisation
+  final LocationService _locationService = LocationService();
 
   static const List<Widget> _widgetOptions = <Widget>[
     CurrentlyScreen(key: PageStorageKey('CurrentlyScreen')),
@@ -31,22 +29,34 @@ class HomeScreenState extends State<HomeScreen> {
     WeeklyScreen(key: PageStorageKey('WeeklyScreen')),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+  // Méthode pour gérer la recherche
   void _onSearch(String searchText) {
     setState(() {
       _searchText = searchText;
     });
   }
 
+  // Méthode pour changer d'onglet via la BottomNavigationBar
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    _pageController.jumpToPage(index); // Naviguer vers la page correspondante
+  }
+
+  // Méthode pour gérer le swipe entre les pages
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedIndex = index; // Mettre à jour l'onglet actif lors du swipe
+    });
+  }
+
+  // Méthode pour gérer la géolocalisation
   void _onGeolocate() async {
     _showLocationAccuracyDialog();
   }
 
+  // Affichage du dialogue pour choisir la précision de la localisation
   void _showLocationAccuracyDialog() {
     showDialog(
       context: context,
@@ -75,15 +85,16 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Méthode pour obtenir la position GPS
   void _determinePosition(LocationAccuracy accuracy) async {
     try {
       Position position = await _locationService.determinePosition(accuracy: accuracy);
       setState(() {
-        _locationMessage = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
+        _locationMessage = 'Lat: ${position.latitude}, Lon: ${position.longitude}'; // Stocker les coordonnées
       });
     } catch (e) {
       setState(() {
-        _locationMessage = e.toString();
+        _locationMessage = e.toString(); // Stocker l'erreur si la localisation échoue
       });
     }
   }
@@ -96,15 +107,26 @@ class HomeScreenState extends State<HomeScreen> {
         onSearch: _onSearch,
         onGeolocate: _onGeolocate,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _widgetOptions.elementAt(_selectedIndex),
-            Text(_searchText),
-            if (_locationMessage.isNotEmpty) Text(_locationMessage),
-          ],
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: _onPageChanged,
+              children: _widgetOptions,
+            ),
+          ),
+          // Affichage de la géolocalisation ou d'un message
+          if (_locationMessage.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                _locationMessage,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+        ],
       ),
       bottomNavigationBar: BottomBar(
         selectedIndex: _selectedIndex,

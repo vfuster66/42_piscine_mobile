@@ -4,12 +4,14 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController searchController;
   final Function(String) onSearch;
   final VoidCallback onGeolocate;
+  final VoidCallback onSearchSubmitted;
 
   const TopBar({
+    super.key,
     required this.searchController,
     required this.onSearch,
     required this.onGeolocate,
-    super.key,
+    required this.onSearchSubmitted,
   });
 
   @override
@@ -22,10 +24,13 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
           suffixIcon: IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              onSearch(searchController.text);
-            },
+              onSearchSubmitted();
+            }, // Correction ici
           ),
         ),
+        onSubmitted: (value) {
+          onSearchSubmitted();
+        },
       ),
       actions: [
         IconButton(

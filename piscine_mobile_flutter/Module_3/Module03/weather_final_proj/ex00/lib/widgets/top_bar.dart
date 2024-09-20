@@ -6,6 +6,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback onGeolocate;
   final List<Map<String, dynamic>> citySuggestions;
   final Function(String, String?, String, double, double) onSelectCity;
+  final VoidCallback onSearchSubmitted;
 
   const TopBar({
     required this.searchController,
@@ -13,6 +14,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
     required this.onGeolocate,
     required this.citySuggestions,
     required this.onSelectCity,
+    required this.onSearchSubmitted,
     super.key,
   });
 
@@ -126,17 +128,21 @@ class TopBarState extends State<TopBar> {
         child: TextField(
           controller: widget.searchController,
           decoration: InputDecoration(
-            hintText: 'Search for a city',
+            hintText: 'Rechercher une ville',
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             suffixIcon: IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {
                 widget.onSearch(widget.searchController.text);
+                widget.onSearchSubmitted(); // Ajout de l'appel à la méthode pour soumettre la recherche
               },
             ),
           ),
           onChanged: widget.onSearch,
+          onSubmitted: (value) {
+            widget.onSearchSubmitted(); // Appel à la méthode pour soumettre la recherche
+          },
         ),
       ),
       actions: [
@@ -144,7 +150,7 @@ class TopBarState extends State<TopBar> {
           padding: const EdgeInsets.only(right: 16.0), // Add padding to move the button to the left
           child: IconButton(
             icon: const Icon(Icons.location_on, size: 32), // Increase the icon size
-            onPressed: widget.onGeolocate,
+            onPressed: widget.onGeolocate, // Appel à la géolocalisation
           ),
         ),
       ],
@@ -153,4 +159,3 @@ class TopBarState extends State<TopBar> {
     );
   }
 }
-

@@ -33,9 +33,24 @@ class CalculatorState extends State<Calculator> {
           _result = 'Error';
         }
       } else {
-        _expression += buttonText;
+        // Vérifier si le dernier caractère de l'expression est un opérateur
+        if (isOperator(buttonText)) {
+          if (_expression.isNotEmpty && isOperator(_expression[_expression.length - 1])) {
+            // Remplacer l'opérateur précédent par le nouveau
+            _expression = _expression.substring(0, _expression.length - 1) + buttonText;
+          } else {
+            _expression += buttonText;
+          }
+        } else {
+          _expression += buttonText;
+        }
       }
     });
+  }
+
+  // Fonction pour vérifier si le texte est un opérateur
+  bool isOperator(String value) {
+    return value == '+' || value == '-' || value == '*' || value == '/';
   }
 
   @override

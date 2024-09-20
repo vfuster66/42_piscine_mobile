@@ -1,5 +1,3 @@
-
-// entry_form_page.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,20 +23,20 @@ class EntryFormPageState extends State<EntryFormPage> {
   String? _selectedFeeling;
 
   final List<Map<String, String>> _feelings = [
-    {'label': 'Happy', 'emoji': '😊'},
-    {'label': 'Sad', 'emoji': '😢'},
-    {'label': 'Angry', 'emoji': '😠'},
-    {'label': 'Excited', 'emoji': '😃'},
-    {'label': 'Tired', 'emoji': '😴'},
-    {'label': 'Confused', 'emoji': '😕'},
-    {'label': 'Surprised', 'emoji': '😮'},
-    {'label': 'Calm', 'emoji': '😌'},
-    {'label': 'Fearful', 'emoji': '😨'},
-    {'label': 'Disgusted', 'emoji': '🤢'},
-    {'label': 'Pensive', 'emoji': '🤔'},
-    {'label': 'Joyful', 'emoji': '😁'},
-    {'label': 'Relaxed', 'emoji': '😎'},
-    {'label': 'Annoyed', 'emoji': '😒'},
+    {'label': 'Heureux', 'emoji': '😊'},
+    {'label': 'Triste', 'emoji': '😢'},
+    {'label': 'En colère', 'emoji': '😠'},
+    {'label': 'Excité', 'emoji': '😃'},
+    {'label': 'Fatigué', 'emoji': '😴'},
+    {'label': 'Confus', 'emoji': '😕'},
+    {'label': 'Surpris', 'emoji': '😮'},
+    {'label': 'Calme', 'emoji': '😌'},
+    {'label': 'Peur', 'emoji': '😨'},
+    {'label': 'Dégoûté', 'emoji': '🤢'},
+    {'label': 'Pensif', 'emoji': '🤔'},
+    {'label': 'Joyeux', 'emoji': '😁'},
+    {'label': 'Détendu', 'emoji': '😎'},
+    {'label': 'Agacé', 'emoji': '😒'},
   ];
 
   @override
@@ -92,7 +90,7 @@ class EntryFormPageState extends State<EntryFormPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a feeling')),
+        const SnackBar(content: Text('Veuillez sélectionner une émotion')),
       );
     }
   }
@@ -111,6 +109,10 @@ class EntryFormPageState extends State<EntryFormPage> {
     }
   }
 
+  void _cancelEntry() {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color darkPurple = Color(0xFF6A0DAD);
@@ -118,7 +120,6 @@ class EntryFormPageState extends State<EntryFormPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Image de fond
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -135,11 +136,11 @@ class EntryFormPageState extends State<EntryFormPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20), // Add space at the top
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: _titleController,
                       decoration: InputDecoration(
-                        labelText: 'Title',
+                        labelText: 'Titre',
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -148,7 +149,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter a title';
+                          return 'Veuillez entrer un titre';
                         }
                         return null;
                       },
@@ -157,7 +158,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                     TextFormField(
                       controller: _contentController,
                       decoration: InputDecoration(
-                        labelText: 'Content',
+                        labelText: 'Contenu',
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -167,7 +168,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                       maxLines: 5,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter some content';
+                          return 'Veuillez entrer du contenu';
                         }
                         return null;
                       },
@@ -177,8 +178,8 @@ class EntryFormPageState extends State<EntryFormPage> {
                       children: [
                         Text(
                           _selectedDate != null
-                              ? 'Date: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}'
-                              : 'No date selected',
+                              ? 'Date : ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}'
+                              : 'Aucune date sélectionnée',
                           style: const TextStyle(fontSize: 16, color: darkPurple),
                         ),
                         const SizedBox(width: 20),
@@ -191,18 +192,18 @@ class EntryFormPageState extends State<EntryFormPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text('Select date'),
+                          child: const Text('Sélectionner une date'),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text('Feeling:', style: TextStyle(fontSize: 16, color: darkPurple)),
+                    const Text('Émotion :', style: TextStyle(fontSize: 16, color: darkPurple)),
                     Wrap(
-                      spacing: 4.0, // Reduced spacing
-                      runSpacing: 4.0, // Reduced run spacing
+                      spacing: 4.0,
+                      runSpacing: 4.0,
                       children: _feelings.map((feeling) {
                         return SizedBox(
-                          width: 40, // Fixed width for each emoji container, reduced size
+                          width: 40,
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -212,8 +213,8 @@ class EntryFormPageState extends State<EntryFormPage> {
                             child: Tooltip(
                               message: feeling['label']!,
                               child: Container(
-                                margin: const EdgeInsets.all(2.0), // Reduced margin
-                                padding: const EdgeInsets.all(2.0), // Reduced padding
+                                margin: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(2.0),
                                 decoration: BoxDecoration(
                                   color: _selectedFeeling == feeling['label']
                                       ? darkPurple.withOpacity(0.3)
@@ -228,7 +229,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                                 child: Center(
                                   child: Text(
                                     feeling['emoji']!,
-                                    style: const TextStyle(fontSize: 24), // Reduced font size for emojis
+                                    style: const TextStyle(fontSize: 24),
                                   ),
                                 ),
                               ),
@@ -238,19 +239,39 @@ class EntryFormPageState extends State<EntryFormPage> {
                       }).toList(),
                     ),
                     const SizedBox(height: 20),
-                    Center(
-                      child: TextButton(
-                        onPressed: _saveEntry,
-                        style: TextButton.styleFrom(
-                          foregroundColor: darkPurple,
-                          side: const BorderSide(color: darkPurple),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: _cancelEntry,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: const BorderSide(color: Colors.red),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            ),
+                            child: const Text('Annuler l\'entrée'),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         ),
-                        child: Text(widget.entry != null ? 'Update Entry' : 'Add Entry'),
-                      ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: _saveEntry,
+                            style: TextButton.styleFrom(
+                              foregroundColor: darkPurple,
+                              side: const BorderSide(color: darkPurple),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            ),
+                            child: Text(widget.entry != null ? 'Mettre à jour l\'entrée' : 'Ajouter une entrée'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

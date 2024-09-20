@@ -1,12 +1,21 @@
 
 // main.dart
-import 'package:diaryfinalapp/first_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:diaryapp/first_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  try {
+
+    await Firebase.initializeApp();
+    print("Firebase initialized successfully.");
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
+
   runApp(const MyApp());
 }
 
@@ -15,10 +24,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: FirstPage(),
+    return MaterialApp(
+      title: 'DiaryApp',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      home: const FirstPage(),
     );
   }
 }
-
 

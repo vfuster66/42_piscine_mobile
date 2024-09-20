@@ -38,27 +38,27 @@ class AgendaPageState extends State<AgendaPage> {
   DateTime _focusedDay = DateTime.now();
 
   final Map<String, String> _feelingEmojis = {
-    'Happy': '😊',
-    'Sad': '😢',
-    'Angry': '😠',
-    'Excited': '😃',
-    'Tired': '😴',
-    'Confused': '😕',
-    'Surprised': '😮',
-    'Calm': '😌',
-    'Fearful': '😨',
-    'Disgusted': '🤢',
-    'Pensive': '🤔',
-    'Joyful': '😁',
-    'Relaxed': '😎',
-    'Annoyed': '😒',
+    'Heureux': '😊',
+    'Triste': '😢',
+    'En colère': '😠',
+    'Excité': '😃',
+    'Fatigué': '😴',
+    'Confus': '😕',
+    'Surpris': '😮',
+    'Calme': '😌',
+    'Peur': '😨',
+    'Dégoûté': '🤢',
+    'Pensif': '🤔',
+    'Joyeux': '😁',
+    'Détendu': '😎',
+    'Agacé': '😒',
   };
 
   @override
   void initState() {
     super.initState();
     _user = _auth.currentUser;
-    _userName = _user?.displayName ?? 'User';
+    _userName = _user?.displayName ?? 'Utilisateur';
     _entries = _firestore.collection('entries').doc(_user!.uid).collection('userEntries');
   }
 
@@ -92,12 +92,12 @@ class AgendaPageState extends State<AgendaPage> {
       builder: (context) {
         return AlertDialog(
           title: Text(
-            'Entries for ${DateFormat('dd/MM/yyyy').format(selectedDay)}',
+            'Entrées pour le ${DateFormat('dd/MM/yyyy').format(selectedDay)}',
             style: const TextStyle(color: darkPurple),
           ),
           content: SizedBox(
             width: double.maxFinite,
-            height: 400, // Fixe la hauteur pour permettre le défilement
+            height: 400,
             child: StreamBuilder<QuerySnapshot>(
               stream: _entries
                   .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(
@@ -113,7 +113,7 @@ class AgendaPageState extends State<AgendaPage> {
                 final entries = snapshot.data!.docs;
                 if (entries.isEmpty) {
                   return const Center(child: Text(
-                    'No entries for this date.',
+                    'Aucune entrée pour cette date.',
                     style: TextStyle(color: darkPurple),
                   ));
                 }
@@ -140,11 +140,11 @@ class AgendaPageState extends State<AgendaPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Date: ${DateFormat('dd/MM/yyyy').format((entry['date'] as Timestamp).toDate())}',
+                                    'Date : ${DateFormat('dd/MM/yyyy').format((entry['date'] as Timestamp).toDate())}',
                                     style: const TextStyle(color: darkPurple),
                                   ),
                                   Text(
-                                    'Feeling: ${_feelingEmojis[entry['feeling']]} ${entry['feeling']}',
+                                    'Émotion : ${_feelingEmojis[entry['feeling']]} ${entry['feeling']}',
                                     style: const TextStyle(color: darkPurple),
                                   ),
                                 ],
@@ -184,7 +184,7 @@ class AgendaPageState extends State<AgendaPage> {
                       foregroundColor: darkPurple,
                       side: const BorderSide(color: darkPurple),
                     ),
-                    child: const Text('Add New Entry'),
+                    child: const Text('Ajouter une nouvelle entrée'),
                   ),
                   const SizedBox(height: 10),
                   TextButton(
@@ -193,7 +193,7 @@ class AgendaPageState extends State<AgendaPage> {
                       foregroundColor: darkPurple,
                       side: const BorderSide(color: darkPurple),
                     ),
-                    child: const Text('Close'),
+                    child: const Text('Fermer'),
                   ),
                 ],
               ),
@@ -218,7 +218,6 @@ class AgendaPageState extends State<AgendaPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Image de fond
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(

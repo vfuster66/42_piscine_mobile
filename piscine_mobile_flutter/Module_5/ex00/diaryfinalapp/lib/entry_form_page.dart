@@ -1,3 +1,6 @@
+
+// entry_form_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,20 +26,20 @@ class EntryFormPageState extends State<EntryFormPage> {
   String? _selectedFeeling;
 
   final List<Map<String, String>> _feelings = [
-    {'label': 'Happy', 'emoji': '😊'},
-    {'label': 'Sad', 'emoji': '😢'},
-    {'label': 'Angry', 'emoji': '😠'},
-    {'label': 'Excited', 'emoji': '😃'},
-    {'label': 'Tired', 'emoji': '😴'},
-    {'label': 'Confused', 'emoji': '😕'},
-    {'label': 'Surprised', 'emoji': '😮'},
-    {'label': 'Calm', 'emoji': '😌'},
-    {'label': 'Fearful', 'emoji': '😨'},
-    {'label': 'Disgusted', 'emoji': '🤢'},
-    {'label': 'Pensive', 'emoji': '🤔'},
-    {'label': 'Joyful', 'emoji': '😁'},
-    {'label': 'Relaxed', 'emoji': '😎'},
-    {'label': 'Annoyed', 'emoji': '😒'},
+    {'label': 'Content', 'emoji': '😊'},
+    {'label': 'Triste', 'emoji': '😢'},
+    {'label': 'Furieux', 'emoji': '😠'},
+    {'label': 'Excité', 'emoji': '😃'},
+    {'label': 'Fatigué', 'emoji': '😴'},
+    {'label': 'Confus', 'emoji': '😕'},
+    {'label': 'Surpris', 'emoji': '😮'},
+    {'label': 'Calme', 'emoji': '😌'},
+    {'label': 'Effrayé', 'emoji': '😨'},
+    {'label': 'Malade', 'emoji': '🤢'},
+    {'label': 'Pensif', 'emoji': '🤔'},
+    {'label': 'Joyeux', 'emoji': '😁'},
+    {'label': 'Relax', 'emoji': '😎'},
+    {'label': 'Agacé', 'emoji': '😒'},
   ];
 
   @override
@@ -44,13 +47,13 @@ class EntryFormPageState extends State<EntryFormPage> {
     super.initState();
 
     _titleController = TextEditingController(
-        text: widget.entry != null ? widget.entry!['title'] : '');
+        text: widget.entry != null ? widget.entry!['titre'] : '');
     _contentController = TextEditingController(
-        text: widget.entry != null ? widget.entry!['content'] : '');
+        text: widget.entry != null ? widget.entry!['contenu'] : '');
     _selectedDate = widget.entry != null
         ? (widget.entry!['date'] as Timestamp).toDate()
         : DateTime.now();
-    _selectedFeeling = widget.entry != null ? widget.entry!['feeling'] : null;
+    _selectedFeeling = widget.entry != null ? widget.entry!['ressenti'] : null;
   }
 
   Future<void> _saveEntry() async {

@@ -13,4 +13,3 @@ class WeeklyScreen extends StatelessWidget {
   }
 }
 
-

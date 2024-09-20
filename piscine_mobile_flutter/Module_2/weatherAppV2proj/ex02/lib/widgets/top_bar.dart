@@ -1,17 +1,17 @@
-
-// widgets/top_bar.dart
 import 'package:flutter/material.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController searchController;
   final Function(String) onSearch;
   final VoidCallback onGeolocate;
+  final VoidCallback onSearchSubmitted; // Ajout de la fonction pour gérer la soumission de recherche
 
   const TopBar({
+    super.key,
     required this.searchController,
     required this.onSearch,
     required this.onGeolocate,
-    super.key,
+    required this.onSearchSubmitted, // Ajout de ce paramètre dans le constructeur
   });
 
   @override
@@ -24,11 +24,13 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
           suffixIcon: IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              onSearch(searchController.text);
+              onSearchSubmitted(); // Appelle la fonction de soumission lorsque le bouton recherche est pressé
             },
           ),
         ),
-        onChanged: onSearch,
+        onSubmitted: (value) {
+          onSearchSubmitted(); // Appelle la fonction de soumission lorsque l'utilisateur appuie sur "Entrée"
+        },
       ),
       actions: [
         IconButton(

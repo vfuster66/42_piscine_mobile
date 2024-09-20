@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
@@ -6,7 +8,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback onGeolocate;
   final List<Map<String, dynamic>> citySuggestions;
   final Function(String, String?, String, double, double) onSelectCity;
-  final double height;
+  final VoidCallback onSearchSubmitted;
 
   const TopBar({
     required this.searchController,
@@ -14,7 +16,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
     required this.onGeolocate,
     required this.citySuggestions,
     required this.onSelectCity,
-    this.height = kToolbarHeight, // Default height
+    required this.onSearchSubmitted,
     super.key,
   });
 
@@ -22,7 +24,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   TopBarState createState() => TopBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(height); // Use the configurable height
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class TopBarState extends State<TopBar> {
@@ -114,6 +116,7 @@ class TopBarState extends State<TopBar> {
     return AppBar(
       title: Container(
         key: _searchFieldKey,
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
@@ -128,24 +131,29 @@ class TopBarState extends State<TopBar> {
         child: TextField(
           controller: widget.searchController,
           decoration: InputDecoration(
-            hintText: 'Search for a city',
+            hintText: 'Rechercher une ville',
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             suffixIcon: IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {
                 widget.onSearch(widget.searchController.text);
+                widget.onSearchSubmitted();
               },
             ),
           ),
           onChanged: widget.onSearch,
+          onSubmitted: (value) {
+            widget.onSearchSubmitted();
+          },
         ),
       ),
+
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 16.0), // Add padding to move the button to the left
+          padding: const EdgeInsets.only(right: 16.0),
           child: IconButton(
-            icon: const Icon(Icons.location_on, size: 32), // Increase the icon size
+            icon: const Icon(Icons.location_on, size: 32),
             onPressed: widget.onGeolocate,
           ),
         ),

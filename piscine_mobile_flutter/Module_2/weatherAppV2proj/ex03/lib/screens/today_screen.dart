@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'package:intl/intl.dart';
@@ -23,10 +25,15 @@ class TodayScreen extends StatelessWidget {
   }
 
   String formatLocation(String cityName, String region, String country) {
-    if (region.isEmpty) {
-      return '$cityName, $country';
-    }
-    return '$cityName, $region, $country';
+    // Créer une liste avec le nom de la ville, la région (si elle existe), et le pays
+    final locationParts = [
+      if (cityName.isNotEmpty) cityName,
+      if (region.isNotEmpty) region, // Ne rajoute la région que si elle n'est pas vide
+      if (country.isNotEmpty) country,
+    ];
+
+    // Joindre les parties non vides avec une virgule et un espace
+    return locationParts.join(', ');
   }
 
   @override
@@ -110,6 +117,7 @@ class TodayScreen extends StatelessWidget {
             child: PageView.builder(
               controller: pageController,
               itemCount: hourlyWeather.length,
+              physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 return hourlyWeather[index];
               },

@@ -1,4 +1,3 @@
-
 // screens/home_page.dart
 import 'package:flutter/material.dart';
 import '../widgets/bottom_bar.dart';
@@ -15,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final PageController _pageController = PageController(); // Ajout du PageController
 
   static const List<Widget> _widgetOptions = <Widget>[
     CurrentlyScreen(),
@@ -26,13 +26,20 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    _pageController.jumpToPage(index); // Navigue vers la page correspondante
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index; // Met à jour la BottomBar lors du swiping
+          });
+        },
+        children: _widgetOptions,
       ),
       bottomNavigationBar: BottomBar(
         selectedIndex: _selectedIndex,
@@ -41,4 +48,3 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

@@ -1,5 +1,6 @@
 
 // register_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
@@ -48,7 +49,6 @@ class RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Image de fond
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -142,3 +142,4 @@ class RegisterPageState extends State<RegisterPage> {
     );
   }
 }
+

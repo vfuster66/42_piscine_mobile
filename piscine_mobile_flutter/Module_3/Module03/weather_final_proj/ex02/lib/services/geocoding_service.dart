@@ -1,3 +1,4 @@
+
 // services/geocoding_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -10,15 +11,17 @@ class GeocodingService {
 
     if (response.statusCode == 200) {
       List data = json.decode(response.body)['results'];
+
       return data.map((city) => {
         'name': city['name'],
         'latitude': city['latitude'],
         'longitude': city['longitude'],
-        'country': city['country'],
-        'region': city['admin1']
+        'country': city['country'] ?? 'Inconnu',
+        'region': city['admin1'] ?? ''
       }).toList();
     } else {
       throw Exception('Failed to load coordinates');
     }
   }
 }
+

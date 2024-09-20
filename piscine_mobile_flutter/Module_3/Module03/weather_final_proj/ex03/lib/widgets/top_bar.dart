@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
@@ -7,6 +9,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final List<Map<String, dynamic>> citySuggestions;
   final Function(String, String?, String, double, double) onSelectCity;
   final double height;
+  final VoidCallback onSearchSubmitted;
 
   const TopBar({
     required this.searchController,
@@ -15,6 +18,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
     required this.citySuggestions,
     required this.onSelectCity,
     this.height = kToolbarHeight, // Default height
+    required this.onSearchSubmitted,
     super.key,
   });
 
@@ -114,6 +118,7 @@ class TopBarState extends State<TopBar> {
     return AppBar(
       title: Container(
         key: _searchFieldKey,
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
@@ -128,17 +133,21 @@ class TopBarState extends State<TopBar> {
         child: TextField(
           controller: widget.searchController,
           decoration: InputDecoration(
-            hintText: 'Search for a city',
+            hintText: 'Rechercher une ville',
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             suffixIcon: IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {
                 widget.onSearch(widget.searchController.text);
+                widget.onSearchSubmitted();
               },
             ),
           ),
           onChanged: widget.onSearch,
+          onSubmitted: (value) {
+            widget.onSearchSubmitted();
+          },
         ),
       ),
       actions: [

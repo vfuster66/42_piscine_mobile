@@ -9,28 +9,36 @@ class WeatherService {
 
   Future<Map<String, dynamic>> getWeather(double latitude, double longitude) async {
     final url = '$apiUrl?latitude=$latitude&longitude=$longitude&current_weather=true&hourly=temperature_2m,precipitation&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto';
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Erreur lors de la récupération de la météo : ${response.reasonPhrase}');
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Erreur lors de la récupération de la météo : ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Erreur de connexion à l\'API météo : $e');
     }
   }
 
   Future<List<Map<String, dynamic>>> getCitySuggestions(String cityName) async {
     final url = '$geocodeUrl?name=$cityName';
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['results'] != null && data['results'] is List) {
-        return List<Map<String, dynamic>>.from(data['results']);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['results'] != null && data['results'] is List) {
+          return List<Map<String, dynamic>>.from(data['results']);
+        } else {
+          return [];
+        }
       } else {
-        return [];
+        throw Exception('Erreur lors de la récupération des suggestions de villes : ${response.reasonPhrase}');
       }
-    } else {
-      throw Exception('Erreur lors de la récupération des coordonnées : ${response.reasonPhrase}');
+    } catch (e) {
+      throw Exception('Erreur de connexion à l\'API de géocodage : $e');
     }
   }
 }

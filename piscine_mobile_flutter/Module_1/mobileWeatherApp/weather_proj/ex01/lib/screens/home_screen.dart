@@ -1,5 +1,3 @@
-
-// screens/home_screen.dart
 import 'package:flutter/material.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/top_bar.dart';
@@ -18,18 +16,20 @@ class HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   String _searchText = '';
 
+  final PageController _pageController = PageController();
   final TextEditingController _searchController = TextEditingController();
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    CurrentlyScreen(key: PageStorageKey('CurrentlyScreen')),
-    TodayScreen(key: PageStorageKey('TodayScreen')),
-    WeeklyScreen(key: PageStorageKey('WeeklyScreen')),
+  List<Widget> get _widgetOptions => [
+    CurrentlyScreen(searchText: _searchText),
+    TodayScreen(searchText: _searchText),
+    WeeklyScreen(searchText: _searchText),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    _pageController.jumpToPage(index);
   }
 
   void _onSearch(String searchText) {
@@ -52,14 +52,14 @@ class HomeScreenState extends State<HomeScreen> {
         onSearch: _onSearch,
         onGeolocate: _onGeolocate,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _widgetOptions.elementAt(_selectedIndex),
-            Text(_searchText),
-          ],
-        ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        children: _widgetOptions,
       ),
       bottomNavigationBar: BottomBar(
         selectedIndex: _selectedIndex,
@@ -68,4 +68,3 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
