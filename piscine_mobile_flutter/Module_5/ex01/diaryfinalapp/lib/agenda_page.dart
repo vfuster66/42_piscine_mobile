@@ -38,27 +38,27 @@ class AgendaPageState extends State<AgendaPage> {
   DateTime _focusedDay = DateTime.now();
 
   final Map<String, String> _feelingEmojis = {
-    'Heureux': '😊',
-    'Triste': '😢',
-    'En colère': '😠',
-    'Excité': '😃',
-    'Fatigué': '😴',
-    'Confus': '😕',
-    'Surpris': '😮',
-    'Calme': '😌',
-    'Peur': '😨',
-    'Dégoûté': '🤢',
-    'Pensif': '🤔',
-    'Joyeux': '😁',
-    'Détendu': '😎',
-    'Agacé': '😒',
+    'Happy': '😊',
+    'Sad': '😢',
+    'Angry': '😠',
+    'Excited': '😃',
+    'Tired': '😴',
+    'Confused': '😕',
+    'Surprised': '😮',
+    'Calm': '😌',
+    'Fearful': '😨',
+    'Disgusted': '🤢',
+    'Pensive': '🤔',
+    'Joyful': '😁',
+    'Relaxed': '😎',
+    'Annoyed': '😒',
   };
 
   @override
   void initState() {
     super.initState();
     _user = _auth.currentUser;
-    _userName = _user?.displayName ?? 'Utilisateur';
+    _userName = _user?.displayName ?? 'User';
     _entries = _firestore.collection('entries').doc(_user!.uid).collection('userEntries');
   }
 
@@ -92,7 +92,7 @@ class AgendaPageState extends State<AgendaPage> {
       builder: (context) {
         return AlertDialog(
           title: Text(
-            'Entrées pour le ${DateFormat('dd/MM/yyyy').format(selectedDay)}',
+            'Entries for ${DateFormat('dd/MM/yyyy').format(selectedDay)}',
             style: const TextStyle(color: darkPurple),
           ),
           content: SizedBox(
@@ -112,10 +112,12 @@ class AgendaPageState extends State<AgendaPage> {
                 }
                 final entries = snapshot.data!.docs;
                 if (entries.isEmpty) {
-                  return const Center(child: Text(
-                    'Aucune entrée pour cette date.',
-                    style: TextStyle(color: darkPurple),
-                  ));
+                  return const Center(
+                    child: Text(
+                      'No entries for this date.',
+                      style: TextStyle(color: darkPurple),
+                    ),
+                  );
                 }
                 return Scrollbar(
                   thumbVisibility: true,
@@ -140,11 +142,11 @@ class AgendaPageState extends State<AgendaPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Date : ${DateFormat('dd/MM/yyyy').format((entry['date'] as Timestamp).toDate())}',
+                                    'Date: ${DateFormat('dd/MM/yyyy').format((entry['date'] as Timestamp).toDate())}',
                                     style: const TextStyle(color: darkPurple),
                                   ),
                                   Text(
-                                    'Émotion : ${_feelingEmojis[entry['feeling']]} ${entry['feeling']}',
+                                    'Feeling: ${_feelingEmojis[entry['feeling']]} ${entry['feeling']}',
                                     style: const TextStyle(color: darkPurple),
                                   ),
                                 ],
@@ -184,7 +186,7 @@ class AgendaPageState extends State<AgendaPage> {
                       foregroundColor: darkPurple,
                       side: const BorderSide(color: darkPurple),
                     ),
-                    child: const Text('Ajouter une nouvelle entrée'),
+                    child: const Text('Add New Entry'),
                   ),
                   const SizedBox(height: 10),
                   TextButton(
@@ -193,7 +195,7 @@ class AgendaPageState extends State<AgendaPage> {
                       foregroundColor: darkPurple,
                       side: const BorderSide(color: darkPurple),
                     ),
-                    child: const Text('Fermer'),
+                    child: const Text('Close'),
                   ),
                 ],
               ),

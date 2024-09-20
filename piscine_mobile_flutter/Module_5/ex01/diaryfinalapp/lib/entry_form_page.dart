@@ -23,20 +23,20 @@ class EntryFormPageState extends State<EntryFormPage> {
   String? _selectedFeeling;
 
   final List<Map<String, String>> _feelings = [
-    {'label': 'Heureux', 'emoji': '😊'},
-    {'label': 'Triste', 'emoji': '😢'},
-    {'label': 'En colère', 'emoji': '😠'},
-    {'label': 'Excité', 'emoji': '😃'},
-    {'label': 'Fatigué', 'emoji': '😴'},
-    {'label': 'Confus', 'emoji': '😕'},
-    {'label': 'Surpris', 'emoji': '😮'},
-    {'label': 'Calme', 'emoji': '😌'},
-    {'label': 'Peur', 'emoji': '😨'},
-    {'label': 'Dégoûté', 'emoji': '🤢'},
-    {'label': 'Pensif', 'emoji': '🤔'},
-    {'label': 'Joyeux', 'emoji': '😁'},
-    {'label': 'Détendu', 'emoji': '😎'},
-    {'label': 'Agacé', 'emoji': '😒'},
+    {'label': 'Happy', 'emoji': '😊'},
+    {'label': 'Sad', 'emoji': '😢'},
+    {'label': 'Angry', 'emoji': '😠'},
+    {'label': 'Excited', 'emoji': '😃'},
+    {'label': 'Tired', 'emoji': '😴'},
+    {'label': 'Confused', 'emoji': '😕'},
+    {'label': 'Surprised', 'emoji': '😮'},
+    {'label': 'Calm', 'emoji': '😌'},
+    {'label': 'Fearful', 'emoji': '😨'},
+    {'label': 'Disgusted', 'emoji': '🤢'},
+    {'label': 'Pensive', 'emoji': '🤔'},
+    {'label': 'Joyful', 'emoji': '😁'},
+    {'label': 'Relaxed', 'emoji': '😎'},
+    {'label': 'Annoyed', 'emoji': '😒'},
   ];
 
   @override
@@ -90,7 +90,7 @@ class EntryFormPageState extends State<EntryFormPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner une émotion')),
+        const SnackBar(content: Text('Please select a feeling')),
       );
     }
   }
@@ -140,7 +140,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                     TextFormField(
                       controller: _titleController,
                       decoration: InputDecoration(
-                        labelText: 'Titre',
+                        labelText: 'Title',
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -149,7 +149,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer un titre';
+                          return 'Please enter a title';
                         }
                         return null;
                       },
@@ -158,7 +158,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                     TextFormField(
                       controller: _contentController,
                       decoration: InputDecoration(
-                        labelText: 'Contenu',
+                        labelText: 'Content',
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -168,7 +168,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                       maxLines: 5,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer du contenu';
+                          return 'Please enter some content';
                         }
                         return null;
                       },
@@ -178,8 +178,8 @@ class EntryFormPageState extends State<EntryFormPage> {
                       children: [
                         Text(
                           _selectedDate != null
-                              ? 'Date : ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}'
-                              : 'Aucune date sélectionnée',
+                              ? 'Date: ${DateFormat('dd/MM/yyyy').format(_selectedDate!)}'
+                              : 'No date selected',
                           style: const TextStyle(fontSize: 16, color: darkPurple),
                         ),
                         const SizedBox(width: 20),
@@ -192,12 +192,12 @@ class EntryFormPageState extends State<EntryFormPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text('Sélectionner une date'),
+                          child: const Text('Select date'),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text('Émotion :', style: TextStyle(fontSize: 16, color: darkPurple)),
+                    const Text('Feeling:', style: TextStyle(fontSize: 16, color: darkPurple)),
                     Wrap(
                       spacing: 4.0,
                       runSpacing: 4.0,
@@ -253,7 +253,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
-                            child: const Text('Annuler l\'entrée'),
+                            child: const Text('Cancel Entry'),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -268,7 +268,7 @@ class EntryFormPageState extends State<EntryFormPage> {
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
-                            child: Text(widget.entry != null ? 'Mettre à jour l\'entrée' : 'Ajouter une entrée'),
+                            child: Text(widget.entry != null ? 'Update Entry' : 'Add Entry'),
                           ),
                         ),
                       ],

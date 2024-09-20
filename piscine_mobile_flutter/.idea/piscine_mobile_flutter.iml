@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex00/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex00/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex00/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex01/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex01/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex01/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex02/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex02/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex02/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex03/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex03/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_0/mobileModule00/ex03/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_1/mobileWeatherApp/weather_proj/ex00/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_1/mobileWeatherApp/weather_proj/ex00/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_1/mobileWeatherApp/weather_proj/ex00/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_1/mobileWeatherApp/weather_proj/ex01/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_1/mobileWeatherApp/weather_proj/ex01/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_1/mobileWeatherApp/weather_proj/ex01/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex00/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex00/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex00/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex01/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex01/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex01/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex02/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex02/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex02/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex03/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex03/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_2/weatherAppV2proj/ex03/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex00/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex00/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex00/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex01/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex01/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex01/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex02/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex02/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex02/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex03/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex03/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex03/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex04/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex04/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_3/Module03/weather_final_proj/ex04/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_4/Module04/ex00/diaryapp/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_4/Module04/ex00/diaryapp/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_4/Module04/ex00/diaryapp/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_4/Module04/ex01/diaryapp/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_4/Module04/ex01/diaryapp/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_4/Module04/ex01/diaryapp/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_5/ex00/diaryfinalapp/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_5/ex00/diaryfinalapp/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_5/ex00/diaryfinalapp/build" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_5/ex01/diaryfinalapp/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_5/ex01/diaryfinalapp/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/Module_5/ex01/diaryfinalapp/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
