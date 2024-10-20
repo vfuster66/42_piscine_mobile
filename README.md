@@ -1,5 +1,7 @@
 # Développement d'Applications Mobiles : Android Studio et Flutter
 
+[![vfuster-'s 42 Inception Score](https://badge42.coday.fr/api/v2/cltpx5zqv531101p4bte37ts1/project/3469182)](https://github.com/Coday-meric/badge42) le 22 septembre 2024
+
 ## Android Studio
 
 **Android Studio** est l'environnement de développement intégré (IDE) officiel pour le développement d'applications Android. Il est basé sur IntelliJ IDEA et offre un ensemble d'outils spécialement conçu pour créer des applications Android.
