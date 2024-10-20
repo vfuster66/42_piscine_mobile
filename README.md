@@ -1,7 +1,6 @@
 # Développement d'Applications Mobiles : Android Studio et Flutter
 
-[![42 Project Score](https://42-project-badge.glitch.me/users/vfuster-/project/piscine-mobile)](https://github.com/ricardoreves/42-project-badge)
-le 22 septembre 2024
+✅ Validé 22 septembre 2024
 
 ## Android Studio
 
