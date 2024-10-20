@@ -1,6 +1,7 @@
 # Développement d'Applications Mobiles : Android Studio et Flutter
 
-[![vfuster-'s 42 Inception Score](https://badge42.coday.fr/api/v2/cltpx5zqv531101p4bte37ts1/project/3469182)](https://github.com/Coday-meric/badge42) le 22 septembre 2024
+[![42 Project Score](https://42-project-badge.glitch.me/users/vfuster-/project/piscine-mobile)](https://github.com/ricardoreves/42-project-badge)
+le 22 septembre 2024
 
 ## Android Studio
 
